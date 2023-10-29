@@ -7,6 +7,9 @@ import { SubmitHandler, FieldValues, useForm } from "react-hook-form";
 import AuthSocialButton from "./AuthSocialButton";
 import { BsGithub } from "react-icons/bs"
 import { BsGoogle } from "react-icons/bs"
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { signIn } from "next-auth/react";
 
 type Variant = "LOGIN" | "REGISTER";
 
@@ -41,17 +44,49 @@ const AuthForm = () => {
         setIsLoading(true);
         if(variant === 'REGISTER'){
           // Axios Register
+          axios.post('/api/register', data)
+          .catch(() => toast.error("Something went wrong!"))
+          .finally(() => setIsLoading(false))
         }
 
         if(variant === 'LOGIN'){
           // nEXT Auth Signin
-        }
+          signIn('credentials', {
+            ...data,
+            redirect: false
+          })
+          .then((callback) => {
+            if(callback?.error){
+              toast.error("Invalid credentials");
+            }
+
+            if(callback?.ok && !callback?.error){
+              toast.success("Logged In!")
+            }
+          })
+          .finally(() => {
+            setIsLoading(false);
+          })
+        } 
     }
 
     const socialAction = (action: string) => {
       setIsLoading(true);
 
       // Next auth
+      signIn(action, { redirect: false})
+      .then((callback) => {
+        if(callback?.error){
+          toast.error("Invalid Credentials");
+        }
+
+        if(callback?.ok && !callback?.error){
+          toast.success("Logged In!")
+        }        
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
     }
 
   return (
