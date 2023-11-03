@@ -7,8 +7,8 @@ interface DesktopItemInterface {
     label: string,
     icon: any,
     href: string,
-    onClick: (() => void) | undefined,
-    active: boolean | undefined
+    onClick?: (() => void) ,
+    active?: boolean 
 }
 
 const DesktopItem: React.FC<DesktopItemInterface> = ({
